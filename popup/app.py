@@ -776,41 +776,66 @@ def infer_company_info_with_ai(company_name):
     return None
 
 def fetch_company_info_from_ip(ip_address):
-    """Fetches company/ISP information from an IP address using ip-api.com."""
-    if not ip_address or ip_address in ["127.0.0.1", "localhost", "::1"]:
-        app.logger.warning(f"Skipping IP lookup for local address: {ip_address}")
-        return None, None, None, None # Return None for all geo fields
+    """Fetches company/ISP information from IP(s) using ip-api.com.
+    Supports single IP or comma-separated list.
+    Returns info for the first successful IP only.
+    """
+    if not ip_address:
+        app.logger.warning("Empty IP address received.")
+        return None, None, None, None
 
-    app.logger.info(f"Attempting to fetch geo info from IP: {ip_address}")
+    # Split by comma in case multiple IPs are provided
+    ip_list = [ip.strip() for ip in ip_address.split(",") if ip.strip() and ip not in ["127.0.0.1", "localhost", "::1"]]
+    
+    if not ip_list:
+        app.logger.warning(f"Skipping IP lookup for local or invalid address: {ip_address}")
+        return None, None, None, None
+
     try:
-        api_url = f"http://ip-api.com/json/{ip_address}?fields=status,message,country,regionName,city,isp,org,as,query"
-        response = requests.get(api_url, timeout=2)
-        response.raise_for_status()
-        data = response.json()
+        if len(ip_list) == 1:
+            # Single IP - use /json/{ip}
+            ip = ip_list[0]
+            app.logger.info(f"Fetching geo info for IP: {ip}")
+            api_url = f"http://ip-api.com/json/{ip}?fields=status,message,country,regionName,city,isp,org,query"
+            response = requests.get(api_url, timeout=2)
+            response.raise_for_status()
+            data = response.json()
 
-        if data.get("status") == "success":
-            country = data.get("country", "Unknown")
-            region = data.get("regionName", "Unknown")
-            city = data.get("city", "Unknown")
-            company_name_from_ip = data.get("org") or data.get("isp", "")
-
-            app.logger.info(f"IP info for {ip_address}: Company='{company_name_from_ip}', Country='{country}', Region='{region}', City='{city}'")
-            return company_name_from_ip, country, region, city
+            if data.get("status") == "success":
+                company = data.get("org") or data.get("isp", "")
+                return company, data.get("country", "Unknown"), data.get("regionName", "Unknown"), data.get("city", "Unknown")
+            else:
+                app.logger.warning(f"IP-API.com failed for {ip}: {data.get('message', 'Unknown error')}")
         else:
-            app.logger.warning(f"IP-API.com failed for {ip_address}: {data.get('message', 'Unknown error')}")
-            return None, None, None, None
+            # Multiple IPs - use batch endpoint
+            app.logger.info(f"Batch IP lookup: {ip_list}")
+            batch_url = "http://ip-api.com/batch?fields=status,message,country,regionName,city,isp,org,query"
+            payload = [{"query": ip} for ip in ip_list]
+            response = requests.post(batch_url, json=payload, timeout=4)
+            response.raise_for_status()
+            results = response.json()
+
+            for result in results:
+                if result.get("status") == "success":
+                    company = result.get("org") or result.get("isp", "")
+                    return company, result.get("country", "Unknown"), result.get("regionName", "Unknown"), result.get("city", "Unknown")
+                else:
+                    app.logger.warning(f"IP-API.com failed for {result.get('query')}: {result.get('message', 'Unknown error')}")
+
+        # No successful result
+        return None, None, None, None
+
     except requests.exceptions.RequestException as e:
-        app.logger.error(f"IP-API.com network error for IP '{ip_address}': {e}", exc_info=True)
-        send_error_notification("IP API Error", f"IP-API.com network error for IP '{ip_address}': {e}\nTraceback: {traceback.format_exc()}")
-        return None, None, None, None
+        app.logger.error(f"IP-API.com network error for IP(s) '{ip_address}': {e}", exc_info=True)
+        send_error_notification("IP API Error", f"IP-API.com network error for IP(s) '{ip_address}': {e}\nTraceback: {traceback.format_exc()}")
     except json.JSONDecodeError:
-        app.logger.error(f"IP-API.com JSON decode error for IP '{ip_address}'. Response: {response.text if 'response' in locals() else 'N/A'}", exc_info=True)
-        send_error_notification("IP API Error", f"IP-API.com JSON decode error for IP '{ip_address}'. Response: {response.text if 'response' in locals() else 'N/A'}\nTraceback: {traceback.format_exc()}")
-        return None, None, None, None
+        app.logger.error(f"IP-API.com JSON decode error for IP(s) '{ip_address}'. Response: {response.text if 'response' in locals() else 'N/A'}", exc_info=True)
+        send_error_notification("IP API Error", f"IP-API.com JSON decode error for IP(s) '{ip_address}'. Response: {response.text if 'response' in locals() else 'N/A'}\nTraceback: {traceback.format_exc()}")
     except Exception as e:
-        app.logger.error(f"IP-API.com unexpected error for IP '{ip_address}': {e}", exc_info=True)
-        send_error_notification("IP API Error", f"IP-API.com unexpected error for IP '{ip_address}': {e}\nTraceback: {traceback.format_exc()}")
-        return None, None, None, None
+        app.logger.error(f"Unexpected error for IP(s) '{ip_address}': {e}", exc_info=True)
+        send_error_notification("IP API Error", f"Unexpected error for IP(s) '{ip_address}': {e}\nTraceback: {traceback.format_exc()}")
+
+    return None, None, None, None
 
 def _lookup_company_details(domain, company_name_hint=None):
     """
