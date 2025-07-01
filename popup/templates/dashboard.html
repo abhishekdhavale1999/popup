@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Company Line Analytics Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <style>
+    body {
+      background-color: #f4f6f9;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .dashboard-container {
+      padding: 20px;
+    }
+    .card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .card-title {
+      font-weight: bold;
+      color: #007bff;
+    }
+    canvas {
+      max-height: 300px;
+    }
+    .sidebar {
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 220px;
+      background-color: #343a40;
+      padding-top: 60px;
+      color: white;
+    }
+    .sidebar a {
+      color: #ddd;
+      padding: 12px 20px;
+      display: block;
+      text-decoration: none;
+    }
+    .sidebar a:hover {
+      background-color: #495057;
+      color: white;
+    }
+    .content {
+      margin-left: 240px;
+    }
+    .filters {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    /* Added for loading states */
+    .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        border-radius: 12px;
+    }
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h5 class="text-center">AutoForm Fill</h5>
+    <a href="/dashboard">📊 View Dashboard</a>
+    <a href="/">📋 Go to Form</a>
+    <a href="#" onclick="downloadFilteredCSV()">⬇️ Export CSV</a>
+  </div>
+
+  <div class="content">
+    <div class="dashboard-container">
+      <div class="row mb-4">
+        <div class="col-md-3">
+          <div class="card p-3">
+            <h6 class="card-title">Total Submissions</h6>
+            <h4 id="totalSubmissions">0</h4>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card p-3">
+            <h6 class="card-title">Unique Companies</h6>
+            <h4 id="uniqueCompanies">0</h4>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card p-3">
+            <h6 class="card-title">Unique Countries</h6>
+            <h4 id="uniqueCountries">0</h4>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card p-3">
+            <h6 class="card-title">Avg Load Time</h6>
+            <h4>5.90 sec</h4>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="card p-3 position-relative">
+            <h6 class="card-title">Traffic Sources (All Time)</h6>
+            <canvas id="pieChart"></canvas>
+            <div class="loading-overlay d-none" id="pieChartLoader">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card p-3 position-relative">
+            <h6 class="card-title">Daily Submissions Trend (All Time)</h6>
+            <canvas id="lineChart"></canvas>
+            <div class="loading-overlay d-none" id="lineChartLoader">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <div class="card p-3 position-relative">
+            <h6 class="card-title">Traffic Sources (Today)</h6>
+            <canvas id="todayPieChart"></canvas>
+            <div class="loading-overlay d-none" id="todayPieChartLoader">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card p-3 position-relative">
+            <h6 class="card-title">Visitors by Country (Today)</h6>
+            <canvas id="todayBarChart"></canvas>
+            <div class="loading-overlay d-none" id="todayBarChartLoader">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filters">
+        <input type="text" id="dateFilter" class="form-control" placeholder="Filter by Date">
+        <select id="countryFilter" class="form-select">
+          <option value="">All Countries</option>
+        </select>
+      </div>
+
+      <div class="card p-3 position-relative">
+        <h6 class="card-title">Company Submissions</h6>
+        <div class="table-responsive">
+          <table class="table table-bordered" id="dataTable">
+            <thead class="table-light">
+              <tr>
+                <th>Timestamp</th>
+                <th>Email</th>
+                <th>Company Name</th>
+                <th>Industry</th>
+                <th>Employee Size</th>
+                <th>Country</th>
+                <th>Headquarter</th>
+                <th>HQ Number</th>
+                <th>AI Confidence Score</th>
+                <th>LinkedIn URL</th>
+                <th>Source</th>
+                <th>Personal Phone Number</th> {# New Column Header #}
+              </tr>
+            </thead>
+            <tbody>
+              {# Loop through the 'data' passed from the Flask backend #}
+              {% for row in data %}
+              <tr>
+                <td>{{ row.timestamp }}</td>
+                <td>{{ row.email }}</td>
+                <td>{{ row.company_name }}</td>
+                <td>{{ row.industry }}</td>
+                <td>{{ row.employee_size }}</td>
+                <td>{{ row.country }}</td>
+                <td>{{ row.headquarter }}</td>
+                <td>{{ row.hq_number }}</td>
+                <td>{{ row.ai_confidence_score }}</td>
+                <td><a href="{{ row.linkedin_url }}" target="_blank">{{ row.linkedin_url }}</a></td>
+                <td>{{ row.source }}</td>
+                <td>{{ row.personal_phone_number }}</td> {# New Column Data #}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="loading-overlay d-none" id="dataTableLoader">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+      </div>
+
+      <!-- New section for Event Log (Pixel Tracking Data) -->
+      <div class="row mt-4">
+          <div class="col-md-12">
+              <div class="card p-3 position-relative">
+                  <h6 class="card-title">Event Log </h6>
+                  <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                      <table class="table table-bordered table-sm" id="eventLogTable">
+                          <thead class="table-light">
+                              <tr>
+                                  <th>Timestamp </th>
+                                  <th>Event Name </th>
+                                  <th>User IP </th>
+                                  <th>Location </th> {# Combined Location #}
+                                  <th>User Agent </th>
+                                  <th>Screen </th> {# Combined Screen #}
+                                  <th>Details </th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {# Event log data will be populated by JavaScript #}
+                          </tbody>
+                      </table>
+                  </div>
+                  <div class="loading-overlay d-none" id="eventLogTableLoader">
+                      <div class="spinner-border" role="status">
+                          <span class="visually-hidden">Loading...</span>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const dateInput = document.getElementById('dateFilter');
+    const countryFilter = document.getElementById('countryFilter');
+    const table = document.getElementById('dataTable');
+    let rows = [];
+
+    // event_log is now passed as a Python list of dictionaries,
+    // where 'event_details' is already a Python dictionary (not a string).
+    // Jinja2's tojson | safe will correctly serialize it for JavaScript.
+    const eventLogData = JSON.parse('{{ event_log | tojson | safe }}');
+    const eventLogTableBody = document.querySelector('#eventLogTable tbody');
+
+    // Chart and Table Loaders
+    const pieChartLoader = document.getElementById('pieChartLoader');
+    const lineChartLoader = document.getElementById('lineChartLoader');
+    const todayPieChartLoader = document.getElementById('todayPieChartLoader');
+    const todayBarChartLoader = document.getElementById('todayBarChartLoader');
+    const dataTableLoader = document.getElementById('dataTableLoader');
+    const eventLogTableLoader = document.getElementById('eventLogTableLoader');
+
+
+    flatpickr(dateInput, {
+      dateFormat: "Y-m-d",
+      onChange: applyFilters
+    });
+
+    countryFilter.addEventListener('change', applyFilters);
+
+    function applyFilters() {
+      const selectedDate = dateInput.value;
+      const selectedCountry = countryFilter.value.toLowerCase();
+
+      rows.forEach(row => {
+        const timestamp = row.children[0].innerText;
+        const datePart = timestamp.split('T')[0];
+        const country = row.children[5].innerText.toLowerCase();
+
+        const matchesDate = !selectedDate || datePart === selectedDate;
+        const matchesCountry = !selectedCountry || country.includes(selectedCountry);
+
+        row.style.display = (matchesDate && matchesCountry) ? "" : "none";
+      });
+
+      updateDashboardMetrics();
+    }
+
+    function populateCountryFilter() {
+      const countrySet = new Set();
+      rows.forEach(row => {
+        const countryName = row.children[5].innerText.trim();
+        if (countryName && countryName !== 'N/A') {
+          countrySet.add(countryName);
+        }
+      });
+
+      countryFilter.innerHTML = '<option value="">All Countries</option>';
+      [...countrySet].sort().forEach(country => {
+        const option = document.createElement("option");
+        option.value = country;
+        option.textContent = country;
+        countryFilter.appendChild(option);
+      });
+    }
+
+    function downloadFilteredCSV() {
+      const visibleRows = rows.filter(row => row.style.display !== "none");
+      let csv = [];
+      const headers = [
+        "Timestamp", "Email", "Company Name", "Industry", "Employee Size",
+        "Country", "Headquarter", "HQ Number", "AI Confidence Score",
+        "LinkedIn URL", "Source", "Personal Phone Number"
+      ].map(th => `"${th}"`).join(",");
+      csv.push(headers);
+
+      visibleRows.forEach(row => {
+        const cols = row.querySelectorAll("td");
+        const rowData = Array.from(cols).map(col => `"${col.innerText.replace(/"/g, '""')}"`).join(",");
+        csv.push(rowData);
+      });
+
+      const blob = new Blob([csv.join("\n")], { type: 'text/csv;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.setAttribute("href", url);
+      a.setAttribute("download", "filtered_company_submissions.csv");
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }
+
+    function updateDashboardMetrics() {
+      const visibleRows = rows.filter(row => row.style.display !== "none");
+      const uniqueCompanies = new Set();
+      const uniqueCountries = new Set();
+      const dailySubmissionCounts = {};
+
+      visibleRows.forEach(row => {
+        const timestamp = row.children[0].innerText.trim();
+        const date = timestamp.split("T")[0];
+        const company = row.children[2].innerText.trim();
+        const country = row.children[5].innerText.trim();
+
+        dailySubmissionCounts[date] = (dailySubmissionCounts[date] || 0) + 1;
+        if (company && company !== 'N/A') uniqueCompanies.add(company);
+        if (country && country !== 'N/A') uniqueCountries.add(country);
+      });
+
+      document.getElementById("totalSubmissions").innerText = visibleRows.length;
+      document.getElementById("uniqueCompanies").innerText = uniqueCompanies.size;
+      document.getElementById("uniqueCountries").innerText = uniqueCountries.size;
+
+      const lineCanvas = document.getElementById('lineChart');
+      const ctx = lineCanvas.getContext('2d');
+      const sortedDates = Object.keys(dailySubmissionCounts).sort((a, b) => new Date(a) - new Date(b));
+      const data = sortedDates.map(date => dailySubmissionCounts[date]);
+
+      if (window.lineChartInstance) window.lineChartInstance.destroy();
+
+      window.lineChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: sortedDates,
+          datasets: [{
+            label: 'Submissions',
+            data: data,
+            fill: false,
+            borderColor: '#007bff',
+            borderWidth: 2,
+            tension: 0.3,
+            pointRadius: 4,
+            pointBackgroundColor: '#007bff',
+            pointBorderColor: '#fff',
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { color: '#333' },
+              grid: { color: 'rgba(0,0,0,0.05)' }
+            },
+            x: {
+              ticks: { color: '#333' },
+              grid: { color: 'rgba(0,0,0,0.05)' }
+            }
+          }
+        }
+      });
+    }
+
+    async function loadLiveTrafficSources() {
+      pieChartLoader.classList.remove('d-none');
+      try {
+          const response = await fetch('/traffic-source-data');
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          const data = await response.json();
+
+          const labels = Object.keys(data);
+          const values = Object.values(data);
+
+          const pieCtx = document.getElementById('pieChart').getContext('2d');
+          if (window.pieChartInstance) window.pieChartInstance.destroy();
+          window.pieChartInstance = new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+              labels: labels,
+              datasets: [{
+                data: values,
+                backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d', '#17a2b8']
+              }]
+            },
+            options: { responsive: true }
+          });
+      } catch (err) {
+          console.error("Failed to load live traffic data", err);
+      } finally {
+          pieChartLoader.classList.add('d-none');
+      }
+    }
+
+    async function loadTodayTrafficSources() {
+      todayPieChartLoader.classList.remove('d-none');
+      try {
+          const response = await fetch('/traffic-source-data-today');
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          const data = await response.json();
+
+          const labels = Object.keys(data);
+          const values = Object.values(data);
+
+          const todayPieCtx = document.getElementById('todayPieChart').getContext('2d');
+          if (window.todayPieChartInstance) window.todayPieChartInstance.destroy();
+          window.todayPieChartInstance = new Chart(todayPieCtx, {
+            type: 'pie',
+            data: {
+              labels: labels,
+              datasets: [{
+                data: values,
+                backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6c757d', '#17a2b8']
+              }]
+            },
+            options: { responsive: true }
+          });
+      } catch (err) {
+          console.error("Failed to load today's traffic source data", err);
+      } finally {
+          todayPieChartLoader.classList.add('d-none');
+      }
+    }
+
+    async function loadTodayVisitorsByCountry() {
+      todayBarChartLoader.classList.remove('d-none');
+      try {
+          const response = await fetch('/traffic-country-data-today');
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          const data = await response.json();
+
+          const labels = Object.keys(data);
+          const values = Object.values(data);
+
+          const todayBarCtx = document.getElementById('todayBarChart').getContext('2d');
+          if (window.todayBarChartInstance) window.todayBarChartInstance.destroy();
+          window.todayBarChartInstance = new Chart(todayBarCtx, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Visitors',
+                data: values,
+                backgroundColor: '#17a2b8'
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  ticks: { color: '#333' },
+                  grid: { color: 'rgba(0,0,0,0.05)' }
+                },
+                x: {
+                  ticks: { color: '#333' },
+                  grid: { color: 'rgba(0,0,0,0.05)' }
+                }
+              }
+            }
+          });
+      } catch (err) {
+          console.error("Failed to load today's visitors by country data", err);
+      } finally {
+          todayBarChartLoader.classList.add('d-none');
+      }
+    }
+
+    function formatTimestampTo12Hour(isoString) {
+        if (!isoString) return 'N/A';
+        const date = new Date(isoString);
+        let hours = date.getHours();
+        const minutes = date.getMinutes();
+        const seconds = date.getSeconds();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        const strMinutes = minutes < 10 ? '0' + minutes : minutes;
+        const strSeconds = seconds < 10 ? '0' + seconds : seconds;
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        const year = date.getFullYear();
+        return `${month}/${day}/${year} ${hours}:${strMinutes}:${strSeconds} ${ampm}`;
+    }
+
+    function populateEventLogTable() {
+        eventLogTableLoader.classList.remove('d-none');
+        eventLogTableBody.innerHTML = '';
+        if (eventLogData && eventLogData.length > 0) {
+            eventLogData.forEach(event => {
+                const row = eventLogTableBody.insertRow();
+
+                const timestampCell = row.insertCell();
+                timestampCell.textContent = formatTimestampTo12Hour(event.timestamp);
+
+                const eventNameCell = row.insertCell();
+                eventNameCell.textContent = event.event_name;
+
+                const userIpCell = row.insertCell();
+                userIpCell.textContent = event.user_ip;
+
+                const locationCell = row.insertCell();
+                let locationText = [];
+                if (event.user_ip_city && event.user_ip_city !== 'Unknown') locationText.push(event.user_ip_city);
+                if (event.user_ip_region && event.user_ip_region !== 'Unknown') locationText.push(event.user_ip_region);
+                if (event.user_ip_country && event.user_ip_country !== 'Unknown') locationText.push(event.user_ip_country);
+                locationCell.textContent = locationText.join(', ') || 'N/A';
+
+                const userAgentCell = row.insertCell();
+                userAgentCell.textContent = event.user_agent;
+
+                const screenCell = row.insertCell();
+                screenCell.textContent = `${event.screen_width}x${event.screen_height}`;
+
+                const detailsCell = row.insertCell();
+                // event.event_details is already a JavaScript object thanks to Python's json.loads and Jinja's tojson|safe
+                const details = event.event_details;
+                let detailText = [];
+                if (details.timeSpentSeconds) {
+                    detailText.push(`Time on Page: ${details.timeSpentSeconds}s`);
+                }
+                if (details.businessInterest) {
+                    detailText.push(`Interest: ${details.businessInterest}`);
+                }
+                if (details.page) {
+                    detailText.push(`Page: ${details.page.split('/').pop() || 'Home'}`);
+                }
+                if (details.modalName) {
+                    detailText.push(`Modal: ${details.modalName}`);
+                }
+                if (details.company) {
+                    detailText.push(`Company: ${details.company}`);
+                }
+                if (details.webinarId) {
+                    detailText.push(`Webinar: ${details.webinarId}`);
+                }
+                // Fallback to JSON.stringify if no specific details are extracted, or if it's not an object
+                detailsCell.textContent = detailText.join('; ') || (typeof details === 'object' ? JSON.stringify(details) : String(details));
+            });
+        } else {
+            const row = eventLogTableBody.insertRow();
+            const cell = row.insertCell();
+            cell.colSpan = 7;
+            cell.textContent = "No event log data available.";
+            cell.style.textAlign = "center";
+        }
+        eventLogTableLoader.classList.add('d-none');
+    }
+
+
+    window.onload = () => {
+      const tableBody = table.querySelector('tbody');
+      if (tableBody) {
+          rows.length = 0;
+          // Populate 'rows' from the Jinja2 rendered dataTable
+          Array.from(tableBody.children).forEach(row => rows.push(row));
+      }
+
+      populateCountryFilter();
+      applyFilters(); // This will update the main metrics and line chart based on initial data
+
+      // Load chart data asynchronously
+      loadLiveTrafficSources();
+      loadTodayTrafficSources();
+      loadTodayVisitorsByCountry();
+      populateEventLogTable();
+
+      setInterval(() => {
+        loadLiveTrafficSources();
+        loadTodayTrafficSources();
+        loadTodayVisitorsByCountry();
+        // populateEventLogTable(); // Consider if you want to refresh this frequently
+      }, 300000);
+    };
+  </script>
+</body>
+</html>

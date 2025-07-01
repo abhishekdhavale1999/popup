@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sysdig Webinar On-Demand</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background-color: #fff;
+            padding: 15px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+            text-decoration: none;
+        }
+
+        /* Hero Section */
+        .hero {
+            background-color: #333;
+            color: #fff;
+            padding: 80px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .hero-text h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin: 0;
+            padding-left: 20px; /* Aligned with the design */
+        }
+
+        .hero-image {
+            padding: 20px 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .hero-image img {
+            height: 140px; 
+        }
+
+        .hero-image span {
+            font-size: 24px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        /* Main Content Section */
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 40px 20px;
+            gap: 40px;
+            justify-content: center;
+        }
+
+        .left-column {
+            flex: 2;
+            min-width: 300px;
+            max-width: 700px;
+        }
+
+        .webinar-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .webinar-meta {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 350px; /* Aspect ratio approximation */
+            background-color: #000; /* Placeholder for video */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .video-player img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .video-player::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.2); /* Dark overlay */
+        }
+        
+        .video-player .play-button {
+            position: absolute;
+            z-index: 10;
+            width: 80px;
+            height: 80px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .video-player .play-button::before {
+            content: '';
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 20px 0 20px 30px;
+            border-color: transparent transparent transparent #6aab32; /* Green play triangle */
+            margin-left: 5px;
+        }
+
+        .description p {
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .description ul {
+            list-style: disc;
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .description ul li {
+            margin-bottom: 5px;
+            line-height: 1.6;
+        }
+
+        .presenter-info {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .presenter-info strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Right Column (Form) */
+        .right-column {
+            flex: 1;
+            min-width: 350px;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            height: fit-content; /* Ensure it wraps content */
+        }
+
+        .right-column h2 {
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #333;
+        }
+
+        /* Your provided form styles integrated */
+        /* CSS Variables for theming */
+        :root {
+            --bg-color: #f5f5f5;
+            --card-color: #ffffff;
+            --text-color: #333;
+            --input-bg: #fff;
+            --input-border: #ccc;
+            --read-only-bg: #f1f1f1;
+            --highlight: #6200ea; /* Purple highlight color, adjusted for Sysdig green */
+            --button-bg: #6aab32; /* Sysdig green */
+            --button-hover-bg: #5a912b; /* Darker green on hover */
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+
+        /* Dark mode styles - Keeping them as they were in your provided code */
+        body.dark {
+            --bg-color: #121212;
+            --card-color: #1e1e1e;
+            --text-color: #e0e0e0;
+            --input-bg: #2a2a2a;
+            --input-border: #555;
+            --read-only-bg: #2d2d2d;
+            --highlight: #bb86fc; /* Lighter purple for dark mode highlight */
+            --button-bg: #5a912b; /* Darker green for dark mode button */
+            --button-hover-bg: #6aab32; /* Original green for dark mode hover */
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --info-color: #6c757d;
+        }
+
+        /* Universal box-sizing and font */
+        .right-column * {
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif; /* Adjusted to match site font */
+        }
+
+        /* Container for the form (within right-column) */
+        .right-column .form-container {
+            background-color: var(--card-color);
+            padding: 0; /* Padding handled by right-column */
+            border-radius: 8px; /* Border radius handled by right-column */
+            box-shadow: none; /* Shadow handled by right-column */
+            max-width: 100%; /* Take full width of parent */
+            width: 100%;
+            position: relative;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .right-column h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        .right-column label {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        .right-column input[type="email"],
+        .right-column input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .right-column input[readonly] {
+            background-color: var(--read-only-bg);
+            opacity: 0.9;
+            cursor: default;
+        }
+        
+        .right-column input#linkedin_url[data-clickable="true"] {
+            cursor: pointer;
+            text-decoration: underline;
+            color: var(--highlight); 
+        }
+
+        .right-column #status-message, .right-column #save-status-message {
+            margin-top: 15px; 
+            font-size: 13px;
+            text-align: center;
+            min-height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .right-column #status-message.success, .right-column #save-status-message.success { color: var(--success-color); font-weight: bold; }
+        .right-column #status-message.error, .right-column #save-status-message.error { color: var(--error-color); font-weight: bold; }
+        .right-column #status-message.info, .right-column #save-status-message.info { color: var(--info-color); }
+        .right-column #status-message.warning, .right-column #save-status-message.warning { color: var(--error-color); font-weight: bold; }
+
+        .right-column .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .right-column button {
+            padding: 10px 20px;
+            background-color: var(--button-bg); /* Use new button background variable */
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, opacity 0.3s ease;
+            flex-grow: 1;
+            max-width: 200px;
+        }
+
+        .right-column button:hover {
+            background-color: var(--button-hover-bg); /* Use new button hover background variable */
+            opacity: 1; /* Override opacity for hover, use background color for effect */
+        }
+        .right-column button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .right-column .theme-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+
+        .right-column .loader {
+            display: none;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            height: 20px;
+        }
+
+        .right-column .loader span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--button-bg); /* Use button-bg for loader */
+            margin: 0 2px;
+            border-radius: 50%;
+            animation: bounce 0.6s infinite alternate;
+        }
+
+        .right-column .loader span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .right-column .loader span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+            to {
+                transform: translateY(-10px);
+            }
+        }
+
+        .right-column #company-logo-display {
+            width: 100px;
+            height: 100px;
+            margin: 15px auto;
+            border-radius: 12px;
+            background-color: var(--read-only-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid var(--input-border);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        .right-column #company-logo-display img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 8px; 
+        }
+        .right-column #company-logo-display .logo-placeholder-text {
+            color: var(--text-color);
+            font-size: 12px;
+            text-align: center;
+            padding: 5px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: #ccc;
+            padding: 20px 0;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative; 
+        }
+
+        footer a {
+            color: #6aab32; /* Green links */
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-links {
+            margin-top: 10px;
+        }
+
+        .scroll-to-top {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            background-color: #6aab32;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+
+        .scroll-to-top:hover {
+            background-color: #5a912b;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                padding: 40px 20px;
+                text-align: center;
+            }
+
+            .hero-text h1 {
+                font-size: 36px;
+                padding-left: 0;
+            }
+
+            .main-content {
+                flex-direction: column;
+                padding: 20px;
+                gap: 20px;
+            }
+
+            .left-column, .right-column {
+                min-width: unset;
+                width: 100%;
+            }
+
+            .video-player {
+                height: 250px;
+            }
+
+            .right-column {
+                padding: 20px;
+            }
+            .right-column .button-group {
+                flex-direction: column; 
+            }
+        }
+
+        /* Modal Specific Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--card-color);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 500px;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            position: relative; /* For close button positioning */
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            text-align: center;
+            font-size: 22px;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .modal-content input[type="email"],
+        .modal-content input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .modal-content input[readonly] {
+            background-color: var(--read-only-bg);
+            opacity: 0.9;
+            cursor: default;
+        }
+
+        .modal-content .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .modal-content .modal-buttons button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            background-color: var(--button-bg);
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        .modal-content .modal-buttons button:hover {
+            background-color: var(--button-hover-bg);
+        }
+
+        .modal-content .modal-buttons button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .modal-status {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            min-height: 20px;
+            color: var(--info-color);
+        }
+        .modal-status.error { color: var(--error-color); font-weight: bold; }
+        .modal-status.success { color: var(--success-color); font-weight: bold; }
+
+        .modal-loader {
+            display: none;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .modal-loader span {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: var(--button-bg);
+            margin: 0 3px;
+            border-radius: 50%;
+            animation: bounce 0.6s infinite alternate;
+        }
+        .modal-loader span:nth-child(2) { animation-delay: 0.2s; }
+        .modal-loader span:nth-child(3) { animation-delay: 0.4s; }
+
+        .company-details-display {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--read-only-bg);
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            color: var(--text-color);
+            font-size: 14px;
+        }
+        .company-details-display p {
+            margin: 5px 0;
+        }
+        .company-details-display strong {
+            display: inline-block;
+            width: 120px;
+        }
+        .company-details-display #modal-company-logo-display {
+            width: 80px;
+            height: 80px;
+            margin: 10px auto;
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid var(--input-border);
+        }
+        .company-details-display #modal-company-logo-display img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+        .company-details-display #modal-company-logo-display .logo-placeholder-text {
+            font-size: 10px;
+            text-align: center;
+            color: var(--text-color);
+        }
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            color: #888;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        .close-button:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="#" class="logo">sysdig</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-text">
+            <h1 id="hero-title">Webinar On-Demand</h1>
+        </div>
+        <div class="hero-image">
+            <img id="hero-image" src="" alt="Webinar Hero">
+        </div>
+    </section>
+
+    <div class="main-content container">
+        <div class="left-column">
+            <h2 id="webinar-title" class="webinar-title"></h2>
+            <p id="webinar-meta" class="webinar-meta"></p>
+
+            <div class="video-player">
+                <img id="video-thumbnail" src="" alt="Video Thumbnail"> <div class="play-button"></div>
+            </div>
+
+            <div id="webinar-description" class="description">
+                </div>
+            <div class="presenter-info">
+                <strong>Presenter :</strong>
+                <span id="presenter-name"></span>, <span id="presenter-title"></span>
+            </div>
+        </div>
+
+        <!-- Main form elements, kept hidden as per user's implied request for modal-only interaction -->
+        <div class="right-column" style="display:none;"> 
+            <div class="form-container">
+                <button class="theme-toggle" onclick="toggleTheme()"></button>
+                <h2>Watch Now</h2>
+                <form id="company-form" onsubmit="return false;">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" placeholder="user@domain.com">
+
+                    <div id="status-message" class="info">Enter an email to get company info...</div>
+                    <div class="loader" id="loader">
+                        <span></span><span></span><span></span>
+                    </div>
+                    <div id="company-logo-display">
+                        <span class="logo-placeholder-text">No Logo</span>
+                    </div>
+
+                    <label for="company_name">Company Name:</label>
+                    <input type="text" id="company_name" readonly>
+
+                    <label for="industry">Industry:</label>
+                    <input type="text" id="industry" readonly>
+
+                    <label for="employee_size">Employee Size:</label>
+                    <input type="text" id="employee_size" readonly>
+
+                    <label for="country">Country:</label>
+                    <input type="text" id="country" readonly>
+
+                    <label for="headquarter">Headquarter:</label>
+                    <input type="text" id="headquarter" readonly>
+
+                    <label for="hq_number">HQ Number:</label>
+                    <input type="text" id="hq_number" readonly>
+
+                    <label for="ai_confidence_score">AI Confidence Score:</label>
+                    <input type="text" id="ai_confidence_score" readonly>
+
+                    <label for="linkedin_url">LinkedIn:</label>
+                    <input type="text" id="linkedin_url" readonly>
+                    
+                    <div class="button-group">
+                        <button type="button" id="save-button" disabled>Submit</button>
+                    </div>
+                    <div id="save-status-message" class="info" style="margin-top: 10px;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; Copyright 2025 Intent Amplify®. All Rights Reserved.</p>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Subprocessors</a>
+            <a href="#">Trust Center</a>
+        </div>
+        <a href="#top" class="scroll-to-top">&#9650;</a> </footer>
+
+    <!-- Modals HTML -->
+    <div id="emailModalOverlay" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-button" onclick="closeModals()">&times;</button>
+            <h3>Enter Your Email</h3>
+            <label for="modalEmail">Email:</label>
+            <input type="email" id="modalEmail" placeholder="user@domain.com" required>
+            <div id="modalEmailStatus" class="modal-status"></div>
+            <div class="modal-loader" id="modalEmailLoader">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" id="nextButton">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="phoneModalOverlay" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-button" onclick="closeModals()">&times;</button>
+            <h3>Confirm Company Details & Add Phone</h3>
+            <div class="company-details-display">
+                <div id="modal-company-logo-display">
+                    <span class="logo-placeholder-text">No Logo</span>
+                </div>
+                <p><strong>Company Name:</strong> <span id="modalCompanyName"></span></p>
+                <p><strong>Industry:</strong> <span id="modalIndustry"></span></p>
+                <p><strong>Employee Size:</strong> <span id="modalEmployeeSize"></span></p>
+                <p><strong>Country:</strong> <span id="modalCountry"></span></p>
+                <p><strong>Headquarter:</strong> <span id="modalHeadquarter"></span></p>
+                <p><strong>HQ Number:</strong> <span id="modalHqNumber"></span></p>
+                <p><strong>AI Confidence:</strong> <span id="modalAiConfidenceScore"></span></p>
+                <p><strong>LinkedIn:</strong> <a href="#" target="_blank" id="modalLinkedinUrl">N/A</a></p>
+            </div>
+            <label for="personalPhoneNumber">Personal Phone Number:</label>
+            <input type="text" id="personalPhoneNumber" placeholder="e.g., +1-555-123-4567">
+            <div id="modalPhoneStatus" class="modal-status"></div>
+            <div class="modal-loader" id="modalPhoneLoader">
+                <span></span><span></span><span></span>
+            </div>
+            <div class="modal-buttons">
+                <button type="button" id="backButton">Back</button>
+                <button type="button" id="submitAllButton">Submit All</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Define your webinar data here
+        const webinarData = {
+            "sysdig-ai-powered-cdr": { // A unique ID for this webinar
+                title: "AI-Powered CDR in Action: A Technical Tour of Sysdig Sage™",
+                meta: "Aug 26 2024 | 31 mins",
+                videoThumbnail: "https://pub-508c4d5f728d4e1dbd0331627858433f.r2.dev/2024/08/sysdig.png",
+                heroImage: "https://pub-508c4d5f728d4e1dbd0331627858433f.r2.dev/2024/08/webinars-od-hero.gif",
+                description: `
+                    <p>Imagine having an AI cloud security analyst capable of multi-step reasoning helping you to understand cloud threats better, make faster decisions, and stop attacks in their tracks.</p>
+                    <p>Now, with Sysdig Sage™, it's a reality.</p>
+                    <p>Until now, AI security assistants have only been capable of providing basic responses to queries. This is insufficient for understanding cloud attacks.</p>
+                    <p>Join us for a tour of Sysdig Sage™, where you will see its powerful and unique capabilities in action, including:</p>
+                    <ul>
+                        <li>Multi-step reasoning: In-depth conversation is needed to understand runtime events clearly.</li>
+                        <li>Contextual awareness: responses based on what you observe in the UI.</li>
+                        <li>Guided response: proactive response actions, prevention strategies, and process improvements.</li>
+                    </ul>
+                `,
+                presenterName: "Eric Carter",
+                presenterTitle: "Director, Product Marketing, Sysdig"
+            },
+            // Add more webinar objects here for future use
+            "another-webinar-example": {
+                title: "Understanding Cloud Security Best Practices",
+                meta: "Sep 15 2024 | 45 mins",
+                videoThumbnail: "https://pub-508c4d5f728d4e1dbd0331627858433f.r2.dev/2024/08/some-other-thumbnail.jpg", // Example placeholder, replace with actual
+                heroImage: "https://pub-508c4d5f728d4e1dbd0331627858433f.r2.dev/2024/08/some-other-hero.gif", // Example placeholder, replace with actual
+                description: `
+                    <p>Diver deep into the essential practices for securing your cloud infrastructure.</p>
+                    <p>This webinar covers:</p>
+                    <ul>
+                        <li>Identity and Access Management (IAM)</li>
+                        <li>Network Security</li>
+                        <li>Data Encryption</li>
+                        <li>Compliance and Governance</li>
+                    </ul>
+                `,
+                presenterName: "Jane Doe",
+                presenterTitle: "Cloud Security Expert"
+            }
+        };
+
+        // Get references to all necessary DOM elements (main form elements - kept hidden)
+        const emailInputMain = document.getElementById('email'); // This is the hidden main form email
+        const companyNameInputMain = document.getElementById('company_name');
+        const industryInputMain = document.getElementById('industry');
+        const employeeSizeInputMain = document.getElementById('employee_size');
+        const countryInputMain = document.getElementById('country');
+        const headquarterInputMain = document.getElementById('headquarter');
+        const hqNumberInputMain = document.getElementById('hq_number');
+        const aiConfidenceScoreInputMain = document.getElementById('ai_confidence_score');
+        const linkedinUrlInputMain = document.getElementById('linkedin_url');
+        const companyLogoDisplayMain = document.getElementById('company-logo-display'); // Main form logo display
+
+        // Modal DOM elements
+        const emailModalOverlay = document.getElementById('emailModalOverlay');
+        const modalEmailInput = document.getElementById('modalEmail');
+        const nextButton = document.getElementById('nextButton');
+        const modalEmailStatus = document.getElementById('modalEmailStatus');
+        const modalEmailLoader = document.getElementById('modalEmailLoader');
+
+        const phoneModalOverlay = document.getElementById('phoneModalOverlay');
+        const modalCompanyName = document.getElementById('modalCompanyName');
+        const modalIndustry = document.getElementById('modalIndustry');
+        const modalEmployeeSize = document.getElementById('modalEmployeeSize');
+        const modalCountry = document.getElementById('modalCountry');
+        const modalHeadquarter = document.getElementById('modalHeadquarter');
+        const modalHqNumber = document.getElementById('modalHqNumber');
+        const modalAiConfidenceScore = document.getElementById('modalAiConfidenceScore');
+        const modalLinkedinUrl = document.getElementById('modalLinkedinUrl');
+        const modalCompanyLogoDisplay = document.getElementById('modal-company-logo-display');
+        const personalPhoneNumberInput = document.getElementById('personalPhoneNumber');
+        const backButton = document.getElementById('backButton');
+        const submitAllButton = document.getElementById('submitAllButton');
+        const modalPhoneStatus = document.getElementById('modalPhoneStatus');
+        const modalPhoneLoader = document.getElementById('modalPhoneLoader');
+
+        let currentCompanyData = {}; // To store fetched company data
+        let pageLoadTime = Date.now(); // Track page load time for time on page calculation
+        let currentWebinarId = "sysdig-ai-powered-cdr"; // Default or dynamically set
+
+        // --- Modal Control Functions ---
+        function closeModals() {
+            emailModalOverlay.classList.remove('active');
+            phoneModalOverlay.classList.remove('active');
+            // Optionally, reset form fields when closing
+            resetFormAndStatus();
+            personalPhoneNumberInput.value = ''; // Clear personal phone number
+        }
+
+        function openEmailModal() {
+            closeModals(); // Ensure other modals are closed
+            emailModalOverlay.classList.add('active');
+            modalEmailInput.value = ''; // Clear email input on opening
+            modalEmailStatus.textContent = '';
+            modalEmailStatus.className = 'modal-status';
+            modalEmailLoader.style.display = 'none';
+            nextButton.disabled = false; // Enable next button
+            trackEvent('Modal_Opened', { modalName: 'Email_Modal' }); // Track event
+        }
+
+        function openPhoneModal() {
+            closeModals(); // Ensure other modals are closed
+            phoneModalOverlay.classList.add('active');
+            personalPhoneNumberInput.value = ''; // Clear personal phone input on opening
+            modalPhoneStatus.textContent = '';
+            modalPhoneStatus.className = 'modal-status';
+            modalPhoneLoader.style.display = 'none';
+            submitAllButton.disabled = false; // Enable submit button
+
+            // Populate company details in the phone modal
+            modalCompanyName.textContent = currentCompanyData.company_name || 'N/A';
+            modalIndustry.textContent = currentCompanyData.industry || 'N/A';
+            modalEmployeeSize.textContent = currentCompanyData.employee_size || 'N/A';
+            modalCountry.textContent = currentCompanyData.country || 'N/A';
+            modalHeadquarter.textContent = currentCompanyData.headquarter || 'N/A';
+            modalHqNumber.textContent = currentCompanyData.hq_number || 'N/A';
+            modalAiConfidenceScore.textContent = currentCompanyData.ai_confidence_score || 'N/A';
+            
+            if (currentCompanyData.linkedin && currentCompanyData.linkedin !== 'N/A' && currentCompanyData.linkedin.startsWith('http')) {
+                modalLinkedinUrl.href = currentCompanyData.linkedin;
+                modalLinkedinUrl.textContent = currentCompanyData.linkedin.split('/')[2]; // Display domain only
+            } else {
+                modalLinkedinUrl.href = '#';
+                modalLinkedinUrl.textContent = 'N/A';
+            }
+
+            modalCompanyLogoDisplay.innerHTML = '';
+            if (currentCompanyData.logo && currentCompanyData.logo !== 'N/A' && currentCompanyData.logo.startsWith('http')) {
+                const img = document.createElement('img');
+                img.src = currentCompanyData.logo;
+                img.alt = (currentCompanyData.company_name || 'Company') + ' logo';
+                img.onerror = () => {
+                    modalCompanyLogoDisplay.innerHTML = '<span class="logo-placeholder-text">No Logo</span>';
+                };
+                modalCompanyLogoDisplay.appendChild(img);
+            } else {
+                modalCompanyLogoDisplay.innerHTML = '<span class="logo-placeholder-text">No Logo</span>';
+            }
+            trackEvent('Modal_Opened', { modalName: 'Phone_Modal', company: currentCompanyData.company_name }); // Track event
+        }
+
+        // Function to reset all fields to empty/N/A and hide loader/status (for main form fields)
+        function resetFormAndStatus() {
+            emailInputMain.value = '';
+            companyNameInputMain.value = '';
+            industryInputMain.value = '';
+            employeeSizeInputMain.value = '';
+            countryInputMain.value = '';
+            headquarterInputMain.value = '';
+            hqNumberInputMain.value = '';
+            aiConfidenceScoreInputMain.value = '';
+            linkedinUrlInputMain.value = '';
+            linkedinUrlInputMain.onclick = null;
+            linkedinUrlInputMain.style.cursor = 'default';
+            linkedinUrlInputMain.removeAttribute('data-clickable');
+            companyLogoDisplayMain.innerHTML = '<span class="logo-placeholder-text">No Logo</span>';
+        }
+
+        // Function to populate main form's hidden fields with data or 'N/A'
+        function populateMainFormFields(data) {
+            emailInputMain.value = modalEmailInput.value; // Keep email in the main hidden field
+            companyNameInputMain.value = data.company_name || 'N/A';
+            industryInputMain.value = data.industry || 'N/A';
+            employeeSizeInputMain.value = data.employee_size || 'N/A';
+            countryInputMain.value = data.country || 'N/A';
+            headquarterInputMain.value = data.headquarter || 'N/A';
+            hqNumberInputMain.value = data.hq_number || 'N/A';
+            aiConfidenceScoreInputMain.value = data.ai_confidence_score || 'N/A';
+            
+            if (data.linkedin && data.linkedin !== 'N/A' && data.linkedin.startsWith('http')) {
+                linkedinUrlInputMain.value = data.linkedin;
+                linkedinUrlInputMain.onclick = () => window.open(data.linkedin, '_blank');
+                linkedinUrlInputMain.style.cursor = 'pointer';
+                linkedinUrlInputMain.setAttribute('data-clickable', 'true');
+            } else {
+                linkedinUrlInputMain.value = 'N/A';
+                linkedinUrlInputMain.onclick = null;
+                linkedinUrlInputMain.style.cursor = 'default';
+                linkedinUrlInputMain.removeAttribute('data-clickable');
+            }
+
+            companyLogoDisplayMain.innerHTML = '';
+            if (data.logo && data.logo !== 'N/A' && data.logo.startsWith('http')) {
+                const img = document.createElement('img');
+                img.src = data.logo;
+                img.alt = (data.company_name || 'Company') + ' logo';
+                img.onerror = () => {
+                    companyLogoDisplayMain.innerHTML = '<span class="logo-placeholder-text">No Logo</span>';
+                };
+                companyLogoDisplayMain.appendChild(img);
+            } else {
+                companyLogoDisplayMain.innerHTML = '<span class="logo-placeholder-text">No Logo</span>';
+            }
+        }
+
+        // Main function to fetch company info and validate email deliverability
+        async function handleEmailNext() {
+            const email = modalEmailInput.value.trim();
+            modalEmailStatus.textContent = '';
+            modalEmailStatus.className = 'modal-status';
+            
+            if (!email) {
+                modalEmailStatus.textContent = 'Please enter an email address.';
+                modalEmailStatus.classList.add('error');
+                trackEvent('Email_Validation_Error', { reason: 'Empty Email' }); // Track event
+                return;
+            }
+
+            const emailPattern = /^[^@]+@[^@]+\.[^@]+$/;
+            if (!emailPattern.test(email)) {
+                modalEmailStatus.textContent = 'Invalid email format.';
+                modalEmailStatus.classList.add('error');
+                trackEvent('Email_Validation_Error', { reason: 'Invalid Format', email: email }); // Track event
+                return;
+            }
+
+            modalEmailLoader.style.display = 'block'; 
+            nextButton.disabled = true; 
+            modalEmailStatus.textContent = 'Fetching company info...';
+            modalEmailStatus.classList.add('info');
+
+            try {
+                const response = await fetch("/get-company-info", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (!data.error && data.is_deliverable !== false) {
+                        currentCompanyData = { ...data, email: email }; // Store all fetched data including email
+                        populateMainFormFields(currentCompanyData); // Populate hidden main form fields
+                        trackEvent('Company_Info_Fetched', { company: data.company_name, source: data.source }); // Track event
+                        openPhoneModal(); // Proceed to the next step
+                    } else {
+                        modalEmailStatus.textContent = data.error || 'Email not deliverable.';
+                        modalEmailStatus.classList.add('error');
+                        trackEvent('Email_Deliverability_Failed', { email: email, error: data.error }); // Track event
+                    }
+                } else {
+                    modalEmailStatus.textContent = data.error || 'An error occurred while fetching company information.';
+                    modalEmailStatus.classList.add('error');
+                    trackEvent('API_Fetch_Error', { endpoint: '/get-company-info', error: data.error }); // Track event
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                modalEmailStatus.textContent = 'Network error or server unreachable.';
+                modalEmailStatus.classList.add('error');
+                trackEvent('Network_Error', { endpoint: '/get-company-info', error: error.message }); // Track event
+            } finally {
+                modalEmailLoader.style.display = 'none';
+                nextButton.disabled = false;
+            }
+        }
+
+        // Function to save company info to the database (triggered by Submit All button)
+        async function handleSubmitAll() {
+            const personalPhoneNumber = personalPhoneNumberInput.value.trim();
+            modalPhoneStatus.textContent = '';
+            modalPhoneStatus.className = 'modal-status';
+
+            // Prepare data for submission, including personal phone number
+            const companyDataForSave = {
+                ...currentCompanyData, // All data fetched in step 1
+                personal_phone_number: personalPhoneNumber, // New field
+                source: currentCompanyData.source || "Webinar Form Submission" // Ensure source is carried over or defaulted
+            };
+
+            // Basic validation for personal phone number (optional, adjust as needed)
+            if (!personalPhoneNumber) {
+                modalPhoneStatus.textContent = 'Please enter a personal phone number.';
+                modalPhoneStatus.classList.add('error');
+                trackEvent('Phone_Validation_Error', { reason: 'Empty Phone Number' }); // Track event
+                return;
+            }
+
+            submitAllButton.disabled = true; 
+            backButton.disabled = true;
+            modalPhoneLoader.style.display = 'block';
+            modalPhoneStatus.textContent = 'Submitting data...';
+            modalPhoneStatus.classList.add('info');
+
+            try {
+                const response = await fetch("/save-company-data", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(companyDataForSave)
+                });
+
+                // Check if the response is a redirect (status 302)
+                if (response.redirected) {
+                    modalPhoneStatus.textContent = 'Submission successful! Redirecting...';
+                    modalPhoneStatus.classList.add('success');
+                    trackEvent('Form_Submission_Success', {
+                        email: currentCompanyData.email,
+                        company_name: currentCompanyData.company_name,
+                        phone_provided: personalPhoneNumber ? 'Yes' : 'No'
+                    }); // Track conversion event
+                    window.location.href = response.url; // Follow the redirect
+                } else {
+                    const result = await response.json();
+                    if (result.message) {
+                        modalPhoneStatus.textContent = 'Submission successful! Redirecting...';
+                        modalPhoneStatus.classList.add('success');
+                        trackEvent('Form_Submission_Success', {
+                            email: currentCompanyData.email,
+                            company_name: currentCompanyData.company_name,
+                            phone_provided: personalPhoneNumber ? 'Yes' : 'No'
+                        }); // Track conversion event
+                        // Fallback in case redirect isn't handled automatically by fetch (though it usually is)
+                        window.location.href = '/thank-you'; 
+                    } else if (result.error) {
+                        modalPhoneStatus.textContent = `Submission failed: ${result.error}`;
+                        modalPhoneStatus.classList.add('error');
+                        trackEvent('Form_Submission_Failed', {
+                            email: currentCompanyData.email,
+                            company_name: currentCompanyData.company_name,
+                            error: result.error
+                        }); // Track failure
+                    } else {
+                        modalPhoneStatus.textContent = 'An unknown error occurred during submission.';
+                        modalPhonePhoneStatus.classList.add('error');
+                        trackEvent('Form_Submission_Failed', {
+                            email: currentCompanyData.email,
+                            company_name: currentCompanyData.company_name,
+                            error: 'Unknown error'
+                        }); // Track unknown failure
+                    }
+                }
+            } catch (error) {
+                console.error('Save fetch error:', error);
+                modalPhoneStatus.textContent = 'Network error during submission. Please try again.';
+                modalPhoneStatus.classList.add('error');
+                trackEvent('Network_Error', { endpoint: '/save-company-data', error: error.message }); // Track network error
+            } finally {
+                modalPhoneLoader.style.display = 'none';
+                submitAllButton.disabled = false;
+                backButton.disabled = false;
+            }
+        }
+
+        const debounce = (func, delay) => {
+            let debounceTimeout;
+            return function(...args) {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        };
+
+        // Function to load dynamic content based on webinar ID
+        function loadWebinarContent(webinarId) {
+            const data = webinarData[webinarId];
+            currentWebinarId = webinarId; // Update current webinar ID
+
+            if (!data) {
+                console.error(`Webinar with ID "${webinarId}" not found.`);
+                document.getElementById('webinar-title').textContent = "Webinar Not Found";
+                document.getElementById('webinar-meta').textContent = "";
+                document.getElementById('webinar-description').innerHTML = "<p>The requested webinar could not be found. Please check the URL.</p>";
+                document.getElementById('hero-image').src = "";
+                document.getElementById('hero-image').alt = "Not Found";
+                document.getElementById('video-thumbnail').src = "";
+                document.getElementById('video-thumbnail').alt = "Not Found";
+                document.getElementById('presenter-name').textContent = "";
+                document.getElementById('presenter-title').textContent = "";
+                return;
+            }
+
+            document.getElementById('hero-image').src = data.heroImage;
+            document.getElementById('hero-image').alt = data.title + " Hero Image";
+
+            document.getElementById('webinar-title').textContent = data.title;
+            document.getElementById('webinar-meta').textContent = data.meta;
+            document.getElementById('video-thumbnail').src = data.videoThumbnail;
+            document.getElementById('video-thumbnail').alt = data.title + " Thumbnail";
+            document.getElementById('webinar-description').innerHTML = data.description;
+            document.getElementById('presenter-name').textContent = data.presenterName;
+            document.getElementById('presenter-title').textContent = data.presenterTitle;
+        }
+
+        // Update the sun/moon icon based on current theme
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            updateThemeToggleIcon();
+        }
+
+        // Update the sun/moon icon based on current theme
+        function updateThemeToggleIcon() {
+            const themeToggle = document.querySelector('.theme-toggle');
+            if (document.body.classList.contains('dark')) {
+                themeToggle.innerHTML = '&#9728;'; // Sun icon for dark mode
+            } else {
+                themeToggle.innerHTML = '&#9790;'; // Moon icon for light mode
+            }
+        }
+
+        // Add an event listener for the video play button
+        const playButton = document.querySelector('.video-player .play-button');
+        if (playButton) {
+            playButton.addEventListener('click', () => {
+                // Infer business interest based on webinar ID
+                let businessInterest = "Unknown";
+                if (currentWebinarId === "sysdig-ai-powered-cdr") {
+                    businessInterest = "Cloud Security, AI, Cybersecurity";
+                } else if (currentWebinarId === "another-webinar-example") {
+                    businessInterest = "Cloud Security, IAM, Network Security";
+                }
+                trackEvent('Video_Play_Click', { webinarId: currentWebinarId, businessInterest: businessInterest });
+                // Here you would typically embed and play the actual video
+                // For demonstration, we'll just show an alert.
+                // alert('Video would play here!'); 
+            });
+        }
+
+        // Event Listeners for Modals
+        nextButton.addEventListener('click', debounce(handleEmailNext, 300)); // Debounce to prevent double clicks
+        backButton.addEventListener('click', openEmailModal); // Go back to email modal
+        submitAllButton.addEventListener('click', handleSubmitAll);
+
+        // Function to send client-side events to the backend
+        function trackEvent(eventName, eventDetails = {}) {
+            const userAgent = navigator.userAgent;
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+
+            fetch("/track-event", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    eventName: eventName,
+                    eventDetails: eventDetails,
+                    userAgent: userAgent, // Pass user agent from client
+                    screenWidth: screenWidth,
+                    screenHeight: screenHeight
+                })
+            }).then(response => {
+                if (!response.ok) {
+                    console.error(`Failed to track event ${eventName}: ${response.statusText}`);
+                }
+            }).catch(error => {
+                console.error(`Error tracking event ${eventName}:`, error);
+            });
+        }
+
+        // Track time spent on page when user navigates away or closes tab
+        window.addEventListener('beforeunload', () => {
+            const timeSpent = Date.now() - pageLoadTime; // Time in milliseconds
+            trackEvent('Time_on_Page', { timeSpentSeconds: Math.round(timeSpent / 1000), page: window.location.pathname });
+        });
+
+        // Also track when tab visibility changes (e.g., user switches tabs)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') {
+                const timeSpent = Date.now() - pageLoadTime;
+                trackEvent('Time_on_Page_Hidden', { timeSpentSeconds: Math.round(timeSpent / 1000), page: window.location.pathname });
+            } else {
+                pageLoadTime = Date.now(); // Reset start time when tab becomes visible again
+            }
+        });
+
+
+        // On page load, set initial theme, load default webinar content, and open email modal
+        document.addEventListener('DOMContentLoaded', () => {
+            const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+            if (prefersDarkScheme.matches) {
+                document.body.classList.add('dark');
+            }
+            updateThemeToggleIcon(); 
+            loadWebinarContent("sysdig-ai-powered-cdr"); 
+            openEmailModal(); // Show the first modal on page load
+            trackEvent('Page_View', { page: window.location.pathname, referrer: document.referrer }); // Track initial page view
+        });
+    </script>
+</body>
+</html>

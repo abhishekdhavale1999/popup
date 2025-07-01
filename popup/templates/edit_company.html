@@ -1,0 +1,23 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Edit Company</title><meta name="viewport" content="width=device-width"></head><body>
+    <h2>Add / Update Company</h2>
+    <form id="editForm">
+      <input name="company_name" placeholder="Company Name">
+      <input name="industry" placeholder="Industry">
+      <input name="employee_size" placeholder="Employee Size">
+      <input name="country" placeholder="Country">
+      <input name="aliases" placeholder="Aliases (comma-separated)">
+      <button type="submit">Save</button>
+    </form>
+    <script>
+      document.getElementById("editForm").addEventListener("submit", e => {
+        e.preventDefault();
+        fetch("/save-company", {
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body: JSON.stringify(Object.fromEntries(new FormData(e.target)))
+        })
+        .then(res=>res.json()).then(d=>alert(d.status));
+      });
+    </script>
+  </body></html>
+  

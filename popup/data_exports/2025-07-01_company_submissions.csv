@@ -1,0 +1,2 @@
+timestamp,email,company_name,industry,employee_size,country,headquarter,hq_number,ai_confidence_score,linkedin_url,source,personal_phone_number
+2025-07-01T19:22:53.745029,vasanth.gopi@tcscomm.com,"TCS Communications,",Telecommunications,51-200,,,,Low,,"Clearbit Autocomplete API, + AI-inferred (Gemini)",333333333333
